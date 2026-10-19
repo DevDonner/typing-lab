@@ -21,3 +21,11 @@
 body {
   @apply bg-ink font-sans text-slate-200 antialiased;
 }
+
+/* Harness-only: the standalone page must give the lab a full-height
+   container (the portfolio shell provides this itself via flex-1). */
+html,
+body,
+#root {
+  height: 100%;
+}

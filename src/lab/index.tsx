@@ -139,16 +139,19 @@ export default function TypingLab() {
   }, [test.status])
 
   // Restart keys. Modifier combos (cmd/ctrl/alt + anything) pass through.
+  // Listened on document (not window) so keydowns dispatched at the
+  // document node without bubbling are caught too.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return
-      if (e.key === 'Enter' || e.key === 'Escape') {
+      const k = e.key.toLowerCase()
+      if (k === 'enter' || k === 'escape') {
         e.preventDefault()
         restart()
       }
     }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
   }, [restart])
 
   useEffect(() => {
@@ -234,6 +237,7 @@ export default function TypingLab() {
         else if (/^[a-z]$/.test(ch)) t = applyKey(t, { kind: 'char', ch }, n)
         else if (ch === '\b') t = applyKey(t, { kind: 'backspace' }, n)
       }
+      testRef.current = t // keep getState() consistent before React re-renders
       setTest(t)
       setNow(n)
     },
@@ -245,6 +249,7 @@ export default function TypingLab() {
         n += Math.min(100, ms)
         t = tick(t, n)
       }
+      testRef.current = t
       setTest(t)
       setNow(n)
     },
